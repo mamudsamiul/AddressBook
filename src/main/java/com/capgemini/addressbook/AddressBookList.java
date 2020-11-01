@@ -1,8 +1,10 @@
 package com.capgemini.addressbook;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class AddressBookList {
@@ -67,13 +69,18 @@ public class AddressBookList {
 			addressBookMap.put(bookName, addressBook);
 	}
 
-	public void showDetails() {
+	public void showAllDetails() {
 		if (addressBookMap.size() == 0)
-			System.out.println("No Address Book is present");
+			System.out.println("No AddressBooks are Present");
 		else {
-			for (int i = 0; i < addressList.size(); i++) {
-				AddressBook addressBook = addressList.get(i);
-				addressBook.showDetail();
+			Set set = addressBookMap.entrySet();
+			Iterator iterator = set.iterator();
+			while (iterator.hasNext()) {
+				Map.Entry entry = (Map.Entry) iterator.next();
+				System.out.println("---------------");
+				System.out.println("Address Book : " + entry.getKey());
+				AddressBook addressBook = (AddressBook) entry.getValue();
+				((AddressBook) entry.getValue()).showDetail();
 			}
 		}
 	}
