@@ -1,6 +1,7 @@
 package com.capgemini.addressbook;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -16,6 +17,10 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import com.opencsv.CSVWriter;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 public class AddressBookFileIOService {
 	public static String CONTACT_FILE_NAME = "contactRead.txt";
@@ -23,6 +28,9 @@ public class AddressBookFileIOService {
 
 	public static final String SAMPLE_CSV_FILE_PATH = "./read.csv";
 	public static final String SAMPLE_CSV_FILE_PATH2 = "./write.csv";
+
+	public static final String SAMPLE_JSON_FILE_PATH = "./read.json";
+	public static final String SAMPLE_JSON_FILE_PATH2 = "./write.json";
 
 	public List<Contacts> readData() {
 		List<Contacts> contactsList = new ArrayList<>();
@@ -71,6 +79,7 @@ public class AddressBookFileIOService {
 		return entries;
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Contacts> readCSVData() {
 		List<Contacts> contactsList = new ArrayList<>();
 		try {
@@ -80,12 +89,12 @@ public class AddressBookFileIOService {
 
 			contactsList = csvToBean.parse();
 			reader.close();
-
+			return contactsList;
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
-		return contactsList;
 	}
 
 	public boolean writeCSVData(List<Contacts> contactList) {
@@ -99,5 +108,36 @@ public class AddressBookFileIOService {
 			return false;
 		}
 		return true;
+	}
+
+	public boolean writeJsonData(List<Contacts> contactList) {
+		Gson gson = new Gson();
+		String json = gson.toJson(contactList);
+		try {
+			FileWriter fileWriter = new FileWriter(SAMPLE_JSON_FILE_PATH2);
+			fileWriter.write(json);
+			fileWriter.close();
+			return true;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public boolean readJsonFile() {
+		try {
+			Reader reader = Files.newBufferedReader(Paths.get(SAMPLE_JSON_FILE_PATH));
+			JsonParser jsonParser = new JsonParser();
+			JsonElement obj = jsonParser.parse(reader);
+			JsonArray contactList = (JsonArray) obj;
+			System.out.println(contactList);
+
+			return true;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
 	}
 }
