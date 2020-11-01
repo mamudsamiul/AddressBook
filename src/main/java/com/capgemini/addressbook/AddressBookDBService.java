@@ -1,6 +1,7 @@
 package com.capgemini.addressbook;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -71,5 +72,21 @@ public class AddressBookDBService {
 		List<Contacts> tempList = this.readContacts();
 		return tempList.stream().filter(contact -> contact.getFirstName().contentEquals(firstName)).findFirst()
 				.orElse(null);
+	}
+
+	public int getContactsOnDateRange(LocalDate startDate, LocalDate endDate) throws AddressBookDBException {
+		String sql = String.format("SELECT Id FROM addressbook WHERE joining BETWEEN '%s' AND '%s';",
+				Date.valueOf(startDate), Date.valueOf(endDate));
+		int noOfContacts = 0;
+		try (Connection connection = getConnection()) {
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(sql);
+			while (resultSet.next()) {
+				noOfContacts++;
+			}
+		} catch (SQLException e) {
+			throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR, e.getMessage());
+		}
+		return noOfContacts;
 	}
 }
