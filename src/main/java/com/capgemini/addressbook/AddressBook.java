@@ -139,6 +139,7 @@ public class AddressBook {
 			Iterator iterator = set.iterator();
 			while (iterator.hasNext()) {
 				Map.Entry entry = (Map.Entry) iterator.next();
+				System.out.println("---------------");
 				System.out.println(entry.getValue());
 			}
 		}
@@ -176,5 +177,17 @@ public class AddressBook {
 	public int countPersonsByState(String state) {
 		return contactList.stream().filter(person -> person.getState().equals(state)).collect(Collectors.toList())
 				.size();
+	}
+
+	public List<Contacts> sortPersonsByCity() {
+		return contactList.stream().sorted((a, b) -> a.getCity().compareTo(b.getCity())).collect(Collectors.toList());
+	}
+
+	public List<Contacts> sortPersonsByState() {
+		return contactList.stream().sorted((a, b) -> a.getState().compareTo(b.getState())).collect(Collectors.toList());
+	}
+
+	public List<Contacts> sortPersonsByZip() {
+		return contactList.stream().sorted((a, b) -> a.getZip().compareTo(b.getZip())).collect(Collectors.toList());
 	}
 }
