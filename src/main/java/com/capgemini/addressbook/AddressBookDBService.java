@@ -89,4 +89,19 @@ public class AddressBookDBService {
 		}
 		return noOfContacts;
 	}
+
+	public int retriveBasedOnField(String field, String value) throws AddressBookDBException {
+		String sql = String.format("SELECT id FROM addressbook WHERE %s = '%s';", field, value);
+		int noOfContacts = 0;
+		try (Connection connection = getConnection()) {
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(sql);
+			while (resultSet.next()) {
+				noOfContacts++;
+			}
+		} catch (SQLException e) {
+			throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR, e.getMessage());
+		}
+		return noOfContacts;
+	}
 }
