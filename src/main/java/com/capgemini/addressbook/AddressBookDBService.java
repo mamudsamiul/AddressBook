@@ -104,4 +104,49 @@ public class AddressBookDBService {
 		}
 		return noOfContacts;
 	}
+
+	public void addContactToDB(String firstName, String lastName, String address, String city, String state, String zip,
+			String phoneNo, String email, LocalDate start) throws AddressBookDBException {
+		int id = -1;
+		Contacts contact = null;
+		Connection connection = null;
+		try {
+			connection = this.getConnection();
+			connection.setAutoCommit(false);
+		} catch (SQLException e) {
+			throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR, e.getMessage());
+		}
+		try (Statement statement = connection.createStatement()) {
+			String sql = String.format(
+					"INSERT INTO addressbook (first_name, last_name, address, city, state, zip, phone, email, joining)"
+							+ "VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s')",
+					firstName, lastName, address, city, state, zip, phoneNo, email, Date.valueOf(start));
+			int rowAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
+			if (rowAffected == 1) {
+				ResultSet resultSet = statement.getGeneratedKeys();
+				if (resultSet.next())
+					id = resultSet.getInt(1);
+			}
+		} catch (SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR, e.getMessage());
+			}
+			throw new AddressBookDBException(AddressBookDBException.ExceptionType.INCORRECT_INFO, e.getMessage());
+		}
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR, e.getMessage());
+		} finally {
+			if (connection != null)
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR,
+							e.getMessage());
+				}
+		}
+	}
 }
