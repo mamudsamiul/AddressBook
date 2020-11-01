@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import com.mysql.jdbc.Driver;
 
@@ -24,20 +25,19 @@ public class AddressBookDBService {
 	}
 
 	public List<Contacts> readContacts() throws AddressBookDBException {
-		String sql = "SELECT * from addressbook ;";
-		List<Contacts> contactList = new ArrayList<Contacts>();
+		String sql = "select * from addressbook;";
 		try (Connection connection = this.getConnection()) {
 			Statement statement = connection.createStatement();
 			ResultSet result = statement.executeQuery(sql);
-			contactList = getContactData(result);
+			AddressBook.contactList = (LinkedList<Contacts>) getContactData(result);
 		} catch (SQLException e) {
 			throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR, e.getMessage());
 		}
-		return contactList;
+		return AddressBook.contactList;
 	}
 
 	private List<Contacts> getContactData(ResultSet result) throws AddressBookDBException {
-		List<Contacts> contactList = new ArrayList<Contacts>();
+		List<Contacts> tempContactList = new LinkedList<Contacts>();
 		try {
 			while (result.next()) {
 				String firstName = result.getString("first_name");
@@ -48,11 +48,28 @@ public class AddressBookDBService {
 				String zip = result.getString("zip");
 				String phoneNo = result.getString("phone");
 				String email = result.getString("email");
-				contactList.add(new Contacts(firstName, lastName, address, city, state, zip, phoneNo, email));
+				tempContactList.add(new Contacts(firstName, lastName, address, city, state, zip, phoneNo, email));
 			}
 		} catch (SQLException e) {
 			throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR, e.getMessage());
 		}
-		return contactList;
+		return tempContactList;
+	}
+
+	public int updatePersonAddress(String firstName, String column, String value) throws AddressBookDBException {
+		String sql = String.format("UPDATE addressbook SET %s = '%s' WHERE first_name = '%s';", column, value,
+				firstName);
+		try (Connection connection = this.getConnection()) {
+			Statement statement = connection.createStatement();
+			return statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR, e.getMessage());
+		}
+	}
+
+	public Contacts isAddressBookInSyncWithDB(String firstName) throws AddressBookDBException {
+		List<Contacts> tempList = this.readContacts();
+		return tempList.stream().filter(contact -> contact.getFirstName().contentEquals(firstName)).findFirst()
+				.orElse(null);
 	}
 }
