@@ -19,16 +19,43 @@ public class AddressBookFileIOTest {
 		System.out.println(contactList);
 		Assert.assertEquals(2, contactList.size());
 	}
-	
+
 	@Test
 	public void writeContactsToFile() {
 		AddressBookFileIOService addressBookFileIOService = new AddressBookFileIOService();
 		List<Contacts> contactList = new ArrayList<>();
-		Contacts contact1 = new Contacts("Samiul","Mamud","Majdia","Kolkata","WB","123456","911234567890","samiul@gmail.com");
-		Contacts contact2 = new Contacts("Liton","Kumar","Patna","Patna","bihar","123456","919123456789","liton@gmail.com");
+		Contacts contact1 = new Contacts("Samiul", "Mamud", "Majdia", "Kolkata", "WB", "123456", "911234567890",
+				"samiul@gmail.com");
+		Contacts contact2 = new Contacts("Liton", "Kumar", "Patna", "Patna", "bihar", "123456", "919123456789",
+				"liton@gmail.com");
 		contactList.add(contact1);
 		contactList.add(contact2);
 		addressBookFileIOService.writeData(contactList);
 		Assert.assertEquals(2, addressBookFileIOService.countEntries());
+	}
+
+	@SuppressWarnings("deprecation")
+	@Test
+	public void givenContactsFromCSVFileShouldRead() {
+		AddressBookFileIOService addressBookFileIOService = new AddressBookFileIOService();
+		List<Contacts> contactList = new ArrayList<>();
+		contactList = addressBookFileIOService.readCSVData();
+		System.out.println(contactList);
+		Assert.assertEquals(2, contactList.size());
+	}
+
+	@SuppressWarnings("deprecation")
+	@Test
+	public void writeContactsToCSVFile() {
+		AddressBookFileIOService addressBookFileIOService = new AddressBookFileIOService();
+		List<Contacts> contactList = new ArrayList<>();
+		Contacts contact1 = new Contacts("Samiul", "Mamud", "Majdia", "Kolkata", "WB", "123456", "911234567890",
+				"samiul@gmail.com");
+		Contacts contact2 = new Contacts("Liton", "Kumar", "Patna", "Patna", "bihar", "123456", "919123456789",
+				"liton@gmail.com");
+		contactList.add(contact1);
+		contactList.add(contact2);
+		boolean b = addressBookFileIOService.writeCSVData(contactList);
+		Assert.assertTrue(b);
 	}
 }
