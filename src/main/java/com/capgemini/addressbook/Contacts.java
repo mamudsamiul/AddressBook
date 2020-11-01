@@ -1,7 +1,7 @@
 package com.capgemini.addressbook;
 
 public class Contacts {
-	private String firstName, lastName, address, city, state, zip, phoneNo, email;
+	private String firstName, lastName, name, address, city, state, zip, phoneNo, email;
 
 	ValidateContact validateContact = new ValidateContact();
 
