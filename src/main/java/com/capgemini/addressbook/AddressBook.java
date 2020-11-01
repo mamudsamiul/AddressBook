@@ -2,8 +2,10 @@ package com.capgemini.addressbook;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class AddressBook {
@@ -64,7 +66,11 @@ public class AddressBook {
 		}
 	}
 
-	public void editContact(String firstName, String lastName) {
+	public void editContact() {
+		System.out.println("Enter First Name :");
+		String firstName = in.next();
+		System.out.println("Enter Last Name :");
+		String lastName = in.next();
 		String name = firstName + " " + lastName;
 		boolean b = false;
 		Boolean keyPresent = contactMap.containsKey(name);
@@ -108,13 +114,10 @@ public class AddressBook {
 					b = contactMap.get(name).setEmail(in.next());
 				}
 				break;
-			default: System.out.println("Invalid input!");
-					break;
 			}
 		} else {
 			System.out.println("This name is not present in the address book.");
 		}
-
 	}
 
 	public void showDetails() {
@@ -126,5 +129,34 @@ public class AddressBook {
 			System.out.println(person);
 		}
 
+	}
+
+	public void showDetail() {
+		if (contactMap.size() == 0)
+			System.out.println("No contacts to show");
+		else {
+			Set set = contactMap.entrySet();
+			Iterator iterator = set.iterator();
+			while (iterator.hasNext()) {
+				Map.Entry entry = (Map.Entry) iterator.next();
+				System.out.println(entry.getValue());
+			}
+		}
+	}
+
+	public void deleteContact() {
+		System.out.println("Enter First Name :");
+		String firstName = in.next();
+		System.out.println("Enter Last Name :");
+		String lastName = in.next();
+		String name = firstName + " " + lastName;
+		Boolean keyPresent = contactMap.containsKey(name);
+		if (keyPresent) {
+			Contacts c = contactMap.get(name);
+			contactList.remove(c);
+			contactMap.remove(name);
+		} else {
+			System.out.println("This name is not present in address book.");
+		}
 	}
 }
