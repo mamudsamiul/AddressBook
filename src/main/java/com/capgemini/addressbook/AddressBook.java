@@ -12,7 +12,6 @@ public class AddressBook {
 	Scanner in = new Scanner(System.in);
 
 	Map<String, Contacts> contactMap;
-	static Map<String, AddressBook> addressBookList = new HashMap<>();
 
 	public AddressBook() {
 		contactMap = new HashMap<>();
