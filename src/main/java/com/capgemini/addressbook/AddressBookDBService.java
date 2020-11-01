@@ -8,13 +8,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 import com.mysql.jdbc.Driver;
 
 public class AddressBookDBService {
 
-	private Connection getConnection() throws AddressBookDBException {
+	private synchronized Connection getConnection() throws AddressBookDBException {
 		String jdbcURL = "jdbc:mysql://localhost:3306/addressbook_service?useSSL=false";
 		String userName = "root";
 		String password = "admin";
@@ -147,6 +150,32 @@ public class AddressBookDBService {
 					throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR,
 							e.getMessage());
 				}
+		}
+	}
+
+	public void addMultipleContacts(List<Contacts> contactsToAddList) throws AddressBookDBException {
+		Map<Integer, Boolean> contactStatusMap = new HashMap<Integer, Boolean>();
+		contactsToAddList.forEach(contact -> {
+			contactStatusMap.put(contact.hashCode(), false);
+			Runnable task = () -> {
+				try {
+					this.addContactToDB(contact.getFirstName(), contact.getLastName(), contact.getAddress(),
+							contact.getCity(), contact.getState(), contact.getZip(), contact.getPhoneNo(),
+							contact.getEmail(), contact.getStartDate());
+				} catch (AddressBookDBException e) {
+					e.printStackTrace();
+				}
+				contactStatusMap.put(contact.hashCode(), true);
+			};
+			Thread thread = new Thread(task, contact.getFirstName());
+			thread.start();
+		});
+		while (contactStatusMap.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR, e.getMessage());
+			}
 		}
 	}
 }
