@@ -58,4 +58,34 @@ public class AddressBookFileIOTest {
 		boolean b = addressBookFileIOService.writeCSVData(contactList);
 		Assert.assertTrue(b);
 	}
+
+	@SuppressWarnings("deprecation")
+	@Test
+	public void writeContactsToJsonFile() {
+		AddressBookFileIOService addressBookFileIOService = new AddressBookFileIOService();
+		List<Contacts> contactList = new ArrayList<>();
+		Contacts contact1 = new Contacts("Samiul", "Mamud", "Majdia", "Kolkata", "WB", "123456", "911234567890",
+				"samiul@gmail.com");
+		Contacts contact2 = new Contacts("Liton", "Kumar", "Patna", "Patna", "bihar", "123456", "919123456789",
+				"liton@gmail.com");
+		contactList.add(contact1);
+		contactList.add(contact2);
+		boolean b = addressBookFileIOService.writeJsonData(contactList);
+		Assert.assertTrue(b);
+	}
+
+	@SuppressWarnings("deprecation")
+	@Test
+	public void readContactsFromJsonFile() {
+		AddressBookFileIOService addressBookFileIOService = new AddressBookFileIOService();
+		List<Contacts> contactList = new ArrayList<>();
+		Contacts contact1 = new Contacts("Samiul", "Mamud", "Majdia", "Kolkata", "WB", "123456", "911234567890",
+				"samiul@gmail.com");
+		Contacts contact2 = new Contacts("Liton", "Kumar", "Patna", "Patna", "bihar", "123456", "919123456789",
+				"liton@gmail.com");
+		contactList.add(contact1);
+		contactList.add(contact2);
+		boolean b = addressBookFileIOService.readJsonFile();
+		Assert.assertTrue(b);
+	}
 }
