@@ -10,9 +10,17 @@ import java.util.TreeMap;
 
 public class AddressBook {
 	Scanner in = new Scanner(System.in);
-	private ArrayList<Contacts> contactList = new ArrayList<>();
-	Map<String, Contacts> contactMap = new HashMap<>();
-	static Map<String, AddressBook> addressBookList = new TreeMap<>();
+
+	Map<String, Contacts> contactMap;
+	static Map<String, AddressBook> addressBookList = new HashMap<>();
+
+	public AddressBook() {
+		contactMap = new HashMap<>();
+	}
+
+	public Map<String, Contacts> getContactMap() {
+		return contactMap;
+	}
 
 	public void addNewContact() {
 		boolean b = false;
@@ -61,7 +69,6 @@ public class AddressBook {
 		if (keyPresent) {
 			System.out.println("This name is already present\n");
 		} else {
-			contactList.add(person);
 			contactMap.put(name, person);
 		}
 	}
@@ -118,16 +125,6 @@ public class AddressBook {
 		} else {
 			System.out.println("This name is not present in the address book.");
 		}
-	}
-
-	public void showDetails() {
-		if (contactList.size() == 0)
-			System.out.println("No contacts to show");
-		for (int i = 0; i < contactList.size(); i++) {
-			Contacts person = contactList.get(i);
-			System.out.println("\nContact :" + (i + 1));
-			System.out.println(person);
-		}
 
 	}
 
@@ -152,8 +149,6 @@ public class AddressBook {
 		String name = firstName + " " + lastName;
 		Boolean keyPresent = contactMap.containsKey(name);
 		if (keyPresent) {
-			Contacts c = contactMap.get(name);
-			contactList.remove(c);
 			contactMap.remove(name);
 		} else {
 			System.out.println("This name is not present in address book.");
