@@ -1,6 +1,7 @@
 package com.capgemini.addressbooktest;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -67,5 +68,16 @@ public class AddressBookDBTest {
 				"gain@yahoo.co.in", LocalDate.now());
 		List<Contacts> contactList = addressBookDBService.readContacts();
 		Assert.assertEquals(8, contactList.size());
+	}
+
+	@Test
+	public void whenAddedMultipleContacts_ShouldMatchCount() throws AddressBookDBException {
+		Contacts[] arrOfContacts = {
+				new Contacts("Abc", "Bcd", "c", "d", "e", "123", "1234567890", "abc@gmail.com", LocalDate.now()),
+				new Contacts("Fgh", "Ghi", "h", "i", "j", "234", "1234567890", "fgh@gmail.com", LocalDate.now()),
+				new Contacts("Klm", "Lmn", "m", "n", "o", "432", "1234567890", "klm@gmail.com", LocalDate.now()) };
+		addressBookDBService.addMultipleContacts(Arrays.asList(arrOfContacts));
+		List<Contacts> contactList = addressBookDBService.readContacts();
+		Assert.assertEquals(10, contactList.size());
 	}
 }
