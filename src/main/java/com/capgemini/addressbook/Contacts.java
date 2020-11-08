@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import com.opencsv.bean.CsvBindByName;
 
 public class Contacts {
-
+	private int id;
 	@CsvBindByName
 	private String firstName;
 
@@ -46,6 +46,12 @@ public class Contacts {
 		this.setZip(zip);
 		this.setPhoneNo(phoneNo);
 		this.setEmail(email);
+	}
+
+	public Contacts(int id, String firstName, String lastName, String address, String city, String state, String zip,
+			String phoneNo, String email) {
+		this(firstName, lastName, address, city, state, zip, phoneNo, email);
+		this.setId(id);
 	}
 
 	public Contacts(String firstName, String lastName, String address, String city, String state, String zip,
@@ -172,6 +178,14 @@ public class Contacts {
 
 	public void setStartDate(LocalDate startDate) {
 		this.startDate = startDate;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	@Override
