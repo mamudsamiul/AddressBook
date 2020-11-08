@@ -1,6 +1,8 @@
 package com.capgemini.addressbooktest;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -65,6 +67,7 @@ public class AddressBookRestAPITest {
 
 	@Test
 	public void givenListOfContact_WhenAdded_ShouldMatch201ResponseAndCount() {
+		Map<Integer, Boolean> contactStatusMap = new HashMap<Integer, Boolean>();
 		Contacts[] arrOfContact = getContactList();
 		AddressBook addressBook;
 		addressBook = new AddressBook(Arrays.asList(arrOfContact));
@@ -74,12 +77,24 @@ public class AddressBookRestAPITest {
 				new Contacts(0, "Samiul", "Mamud", "berhampore", "Murshidabad", "wb", "742101", "9876543210",
 						"mamud@gmail.com") };
 		for (Contacts contact : arrOfContacts) {
-			Response response = addContactToJSONServer(contact);
-			int statusCode = response.getStatusCode();
-			Assert.assertEquals(201, statusCode);
-
-			contact = new Gson().fromJson(response.asString(), Contacts.class);
-			addressBook.addNewContact(contact);
+			contactStatusMap.put(contact.hashCode(), false);
+			Runnable task = () -> {
+				Response response = addContactToJSONServer(contact);
+				int statusCode = response.getStatusCode();
+				Assert.assertEquals(201, statusCode);
+				Contacts newContact = new Gson().fromJson(response.asString(), Contacts.class);
+				addressBook.addNewContact(newContact);
+				contactStatusMap.put(contact.hashCode(), true);
+			};
+			Thread thread = new Thread(task);
+			thread.start();
+		}
+		while (contactStatusMap.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		long entries = AddressBook.contactList.size();
 		Assert.assertEquals(7, entries);

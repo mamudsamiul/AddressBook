@@ -29,13 +29,30 @@ public class AddressBookDBService {
 	}
 
 	public List<Contacts> readContacts() throws AddressBookDBException {
-		String sql = "select * from addressbook;";
-		try (Connection connection = this.getConnection()) {
-			Statement statement = connection.createStatement();
-			ResultSet result = statement.executeQuery(sql);
-			AddressBook.contactList = (LinkedList<Contacts>) getContactData(result);
-		} catch (SQLException e) {
-			throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR, e.getMessage());
+		Map<Integer, Boolean> contactStatusMap = new HashMap<Integer, Boolean>();
+		synchronized (this) {
+			contactStatusMap.put(1, false);
+			Runnable task = () -> {
+				String sql = "select * from addressbook;";
+
+				try (Connection connection = this.getConnection()) {
+					Statement statement = connection.createStatement();
+					ResultSet result = statement.executeQuery(sql);
+					AddressBook.contactList = (LinkedList<Contacts>) getContactData(result);
+				} catch (SQLException | AddressBookDBException e) {
+					e.printStackTrace();
+				}
+				contactStatusMap.put(1, true);
+			};
+			Thread thread = new Thread(task);
+			thread.start();
+		}
+		while (contactStatusMap.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		return AddressBook.contactList;
 	}
@@ -61,14 +78,32 @@ public class AddressBookDBService {
 	}
 
 	public int updatePersonAddress(String firstName, String column, String value) throws AddressBookDBException {
-		String sql = String.format("UPDATE addressbook SET %s = '%s' WHERE first_name = '%s';", column, value,
-				firstName);
-		try (Connection connection = this.getConnection()) {
-			Statement statement = connection.createStatement();
-			return statement.executeUpdate(sql);
-		} catch (SQLException e) {
-			throw new AddressBookDBException(AddressBookDBException.ExceptionType.CONNECTION_ERROR, e.getMessage());
+		Map<Integer, Boolean> contactStatusMap = new HashMap<Integer, Boolean>();
+		int[] result = new int[1];
+		synchronized (this) {
+			contactStatusMap.put(1, false);
+			Runnable task = () -> {
+				String sql = String.format("UPDATE addressbook SET %s = '%s' WHERE first_name = '%s';", column, value,
+						firstName);
+				try (Connection connection = this.getConnection()) {
+					Statement statement = connection.createStatement();
+					result[0] = statement.executeUpdate(sql);
+				} catch (SQLException | AddressBookDBException e) {
+					e.printStackTrace();
+				}
+				contactStatusMap.put(1, true);
+			};
+			Thread thread = new Thread(task);
+			thread.start();
 		}
+		while (contactStatusMap.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		return result[0];
 	}
 
 	public Contacts isAddressBookInSyncWithDB(String firstName) throws AddressBookDBException {
